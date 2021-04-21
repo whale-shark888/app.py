@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config.from_object(settings)  # config for test
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@127.0.0.1:3306/app'  # path：鏈接db的URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 提高性能 減少内存使用
-app.config['SECRET-KEY'] = 'root'  # 密鑰：防止CSRF攻擊
+app.config['SECRET_KEY'] = 'root'  # 密鑰：防止CSRF攻擊
 
 
 db = SQLAlchemy(app)  # 建立對象
@@ -23,11 +23,6 @@ class User(db.Model):
     email = db.Column(db.String(32), nullable=False)
     username = db.Column(db.String(32), nullable=False, unique=True)
     password = db.Column(db.String(32), nullable=False)
-
-    def __init__(self, email, username, password):
-        self.email = email
-        self.username = username
-        self.password = password
 
 
 def add_info(instance):
