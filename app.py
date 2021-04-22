@@ -2,9 +2,9 @@ from flask import Flask, request, make_response
 from flask import render_template
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
+from flask_mail import Mail
 from apps.user.models import User
-from apps.share_content import Content
-
+from apps.share_content.models import Content
 import hashlib
 import settings
 import requests
@@ -12,6 +12,8 @@ from apps import create_app
 from ext import db
 
 app = create_app()
+mail = Mail(app)
+
 manager = Manager(app=app)
 # WSGI  Flask is a class， app is a object
 migrate = Migrate(app=app, db=db)  # config
