@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response, current_app
+from flask import Flask, request, make_response, current_app, session, redirect, url_for
 from flask import render_template
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
@@ -6,9 +6,8 @@ from apps.user.models import User
 from apps.share_content.models import Content
 from apps.gmail.send_mail import *
 import random
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager
-# from flask_login import current_user, login_user
+from flask_login import current_user, login_user
+
 
 from werkzeug.security import generate_password_hash, check_password_hash
 import requests
@@ -37,12 +36,15 @@ def login():
 
 @app.route('/login2', methods=['POST', 'GET'])
 def login2():
+    if current_user.is_authenticated:
+        return redirect(url_for('/index'))
+
     if request.method == 'POST':
-        username = request.form.get('username')
+        email = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        # if user.password == en_password:
-        if User.check_password(password):
+        user = User.query.filter_by(email=email).first()
+
+        if user.check_password(password):
             return 'login successfully'
         else:
             return 'error of username or password'
