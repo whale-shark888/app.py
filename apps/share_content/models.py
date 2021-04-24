@@ -10,11 +10,11 @@ class Content(db.Model):
     text = db.Column(db.Text, nullable=False)
     po_datetime = db.Column(db.DateTime, default=datetime.now)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    user = db.relationship('user', backref='content', secondary='ucpc')
-    picture = db.relationship('picture', backref='content', secondary='ucpc')
-    comment = db.relationship('comment', backref='content', secondary='ucpc')
+    users = db.relationship('User', backref='content', secondary='ucpc')
+    pictures = db.relationship('Picture', backref='content', secondary='ucpc')
+    comments = db.relationship('Comment', backref='content', secondary='ucpc')
 
 
 class Picture(db.Model):
@@ -25,9 +25,9 @@ class Picture(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     picture_binary = db.Column(db.LargeBinary(16777216))
 
-    user = db.relationship('user', backref='picture', secondary='ucpc')
-    content = db.relationship('content', backref='picture', secondary='ucpc')
-    comment = db.relationship('comment', backref='picture', secondary='ucpc')
+    users = db.relationship('User', backref='picture', secondary='ucpc')
+    contents = db.relationship('Content', backref='picture', secondary='ucpc')
+    comments = db.relationship('Comment', backref='picture', secondary='ucpc')
 
 # class User_content(db.Model):
 #     __tablename__ = 'User_content'
@@ -49,12 +49,12 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     comment = db.Column(db.String(255), nullable=False)
 
-    user = db.relationship('user', backref='comment', secondary='ucpc')
-    content = db.relationship('content', backref='comment', secondary='ucpc')
-    picture = db.relationship('picture', backref='comment', secondary='ucpc')
+    users = db.relationship('User', backref='comment', secondary='ucpc')
+    contents = db.relationship('Content', backref='comment', secondary='ucpc')
+    pictures = db.relationship('Picture', backref='comment', secondary='ucpc')
 
 
-class UCPC(): # user content picture comment
+class UCPC(db.Model): # user content picture comment
     __tablename__ = 'ucpc'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     content_id = db.Column(db.Integer, db.ForeignKey('content.id'), nullable=False)

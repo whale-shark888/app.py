@@ -1,19 +1,24 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, current_app
 from flask import render_template
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
-from flask_mail import Mail
 from apps.user.models import User
 from apps.share_content.models import Content
-import hashlib
-import settings
+from apps.gmail.send_mail import *
+import random
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager
+# from flask_login import current_user, login_user
+
+from werkzeug.security import generate_password_hash, check_password_hash
 import requests
 from apps import create_app
 from ext import db
+import os
+from flask_mail import Message, Mail
 
 app = create_app()
-mail = Mail(app)
-
+# login = LoginManager(app)
 manager = Manager(app=app)
 # WSGI  Flask is a class， app is a object
 migrate = Migrate(app=app, db=db)  # config
@@ -35,10 +40,9 @@ def login2():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        en_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        # 需要加密密碼
         user = User.query.filter_by(username=username).first()
-        if user.password == en_password:
+        # if user.password == en_password:
+        if User.check_password(password):
             return 'login successfully'
         else:
             return 'error of username or password'
@@ -52,20 +56,35 @@ def register():
 @app.route('/register2', methods=['POST', 'GET'])
 def register2():
     if request.method == 'POST':
-
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
         re_password = request.form.get('password2')
         if password == re_password and len(password) >= 8:
-            user = User()
-            user.email = email
-            user.username = username
-            user.password = hashlib.sha256(password.encode('utf-8')).hexdigest()  # encrypted
-            # 需要加密密碼
-            db.session.add(user)
-            db.session.commit()
-            return 'content'
+            i = 6
+            b = []
+            while i >= 1:
+                a = random.randint(0, 9)
+                i -= 1
+
+                b.append(str(a))
+            print(b)
+            ve_num = ''.join(b)
+            en_num = generate_password_hash(ve_num)
+            senmail('verify', 'x1098952061@gmail.com', 'verify', ve_num)
+            ip = input('verify:')
+            if check_password_hash(en_num, ip):
+                user = User()
+                user.email = email
+                user.username = username
+                # user.password = hashlib.sha256(password.encode('utf-8')).hexdigest()  # encrypted
+                # 需要加密密碼
+                user.set_password(password)
+                db.session.add(user)
+                db.session.commit()
+                return 'content'
+            else:
+                print('code is wrong')
         else:
             pass
             return 'fail'
