@@ -38,16 +38,18 @@ def login():
 def login2():
     if current_user.is_authenticated:
         return redirect(url_for('/index'))
+    else:
+        if request.method == 'POST':
+            try:
+                email = request.form.get('email')
+                password = request.form.get('password')
+                user = User.query.filter_by(email=email).first()
 
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        user = User.query.filter_by(email=email).first()
-
-        if user.check_password(password):
-            return 'login successfully'
-        else:
-            return 'error of username or password'
+                if user.check_password(password):
+                    login_user(user)
+                    return 'login successfully'
+            except AttributeError:
+                return 'error of username or password'
 
 
 @app.route('/register')
@@ -90,6 +92,12 @@ def register2():
         else:
             pass
             return 'fail'
+
+
+# @app.route('/logout', methods=['GET', 'POST'])
+# def logout():
+#     if current_user.is_authenticated:
+#
 
 
 @app.route('/select', methods=['GET', 'POST'])

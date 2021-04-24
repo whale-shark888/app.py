@@ -10,7 +10,7 @@ from flask_login import LoginManager
 from flask_sslify import SSLify
 login_manager = LoginManager()
 login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'login2'
 # config app and create app
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
